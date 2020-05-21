@@ -61,7 +61,6 @@ def smart():
     if args.url is None:
         print("Smart mode require target URL definition. Please use either of the following flag '-u' or '--url'.")
         exit()
-    #Do Others
     frobber = list(str(args.url))
     for i in range(0,len(frobber)):
         if frobber[i] == ".":
@@ -70,6 +69,7 @@ def smart():
         del tmp[i]
         for tld in config["top_level_domains"]:
             domains.append("".join(tmp)+"."+tld)
+    #Do Other Smart stuff for a specific target, similar to jtr rules
     return
 
 def wordlist():
@@ -84,12 +84,10 @@ def wordlist():
     return
 
 def auto():
-    # Add Auto configuration
-    for r in range(config["min_size"],config["max_size"]):
-        tmp = ["".join(elem) for elem in itertools.permutations(string.ascii_letters, r)]
-        for perm in [list(zip(tmp, p)) for p in itertools.permutations(config["top_level_domains"])]:
-            for elem in [".".join(elem) for elem in perm]:
-                domains.append(elem)
+    dlist = []
+    for r in range(int(config["min_size"]),int(config["max_size"])):
+        dlist.extend(["".join(elem) for elem in itertools.permutations(string.ascii_letters, r)])
+    domains.extend([".".join(tpl) for tpl in list(itertools.product(dlist,config["top_level_domains"]))])
     return
 
 def configure():
@@ -116,13 +114,17 @@ groupA.add_argument("-t_Ms","--max_size", help="Max domain length.")
 groupA.add_argument("-t_t","--throttle", help="Request time interval using pythons time.sleep syntax in seconds (1,1.5,0.5,2,...).")
 groupA.add_argument("-t_bs","--bulk_size", help="Number of domains requested per HTTP request.")
 groupA.add_argument("-t_tld","--top_level_domain", help="Comma-seperated list for top-level domains.")
+groupB = parser.add_argument_group('Filters')
+groupB.add_argument("-f_e", "--expiration",  help="Show websites with expiration time below provided epoch time.Not Done!")
+groupB.add_argument("-f_c", "--category",  action="store_true", help="Only show domains with a category assigned.Not Done!")
+groupB.add_argument("-f_p", "--price",  help="Show websites with price below the value inserted.Not Done!")
 groupB = parser.add_argument_group('Modes')
 groupB.add_argument("-m_s", "--smart", action="store_true", help="Phishing domain searcher based on special goodies for provided target URL.")
 groupB.add_argument("-m_wl", "--wordlist", help="Search based on provided wordlist.")
 groupB.add_argument("-m_a", "--auto_wordlist", action="store_true", help="Creates domain name list based on provided lengths.")
 groupC = parser.add_argument_group('Endpoints')
 groupC.add_argument("-e_u", "--url", help="Target URL.")
-groupC.add_argument("-e_dr", "--domain_registrar", help="Desired Domain Registrar API. Some require python file parameter configuration. Defaults to using NameCheap.")
+groupC.add_argument("-e_dr", "--domain_registrar", help="Desired Domain Registrar API. Some require python file parameter configuration. Defaults to using NameCheap. Not Done")
 groupD = parser.add_argument_group('Others')
 groupD.add_argument("-o_l", "--load_config", help="Load Configs from json file.")
 
@@ -142,6 +144,5 @@ if args.smart:
     smart()
 if args.auto_wordlist:
     auto()
-
-print(domains)	
+#print(domains)
 search()
