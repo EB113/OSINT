@@ -24,7 +24,8 @@ config = {
     "bulk_size" : "1",
     "min_size" : 3,
     "max_size" : 4,
-    "top_level_domains" : ["com","ai","io","cc","co","org"]
+    "top_level_domains" : ["eu","us","io","fr","es"]
+    #"top_level_domains" : ["com","ai","io","cc","co","org"]
     }
 args = ""
 domains = []
@@ -86,7 +87,7 @@ def wordlist():
 def auto():
     dlist = []
     for r in range(int(config["min_size"]),int(config["max_size"])):
-        dlist.extend(["".join(elem) for elem in itertools.permutations(string.ascii_letters, r)])
+        dlist.extend(["".join(elem) for elem in itertools.permutations(string.ascii_lowercase+'0123456789', r)])
     domains.extend([".".join(tpl) for tpl in list(itertools.product(dlist,config["top_level_domains"]))])
     return
 
